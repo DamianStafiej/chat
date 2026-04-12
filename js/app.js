@@ -132,15 +132,28 @@ formularzWiadomosci.addEventListener("submit", async (event) => {
     pobierzWiadomosci();
 });
 
-async function dajLajka(id) {
-    try {
-        await fetch(`https://apichat.m89.pl/api/messages/${id}/like`, {
-            method: 'PATCH'
-        });
+async function dajLajka(idWiadomosci) {
+    // 1. Pobieramy nasz nick z pamięci przeglądarki
+    const mojNick = localStorage.getItem('shoutboxNick');
 
-        pobierzWiadomosci(); // odśwież czat
-    } catch (err) {
-        console.error("Błąd lajkowania:", err);
+    try {
+        await fetch(`https://apichat.m89.pl/api/messages/${idWiadomosci}/like`, {
+            method: 'PATCH',
+            
+            // 2. Mówimy serwerowi: "Hej, wysyłam Ci paczkę w formacie JSON!"
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            
+            // 3. Pakujemy nasz nick do obiektu i zamieniamy na tekst
+            body: JSON.stringify({ author: mojNick }) 
+        });
+        
+        // Odświeżamy czat, żeby od razu zobaczyć dodanego lajka
+        pobierzWiadomosci(); 
+        
+    } catch (error) {
+        console.error("Błąd podczas lajkowania:", error);
     }
 }
 
