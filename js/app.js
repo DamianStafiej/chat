@@ -53,12 +53,13 @@ async function pobierzWiadomosci() {
             
             //avatar
             const linkAwatara = `https://api.dicebear.com/9.x/bottts/svg?seed=${msg.author}`;
-            const mojNick = localStorage.getItem("shoutboxNick");
+            const mojNick = (localStorage.getItem('shoutboxNick') || '').trim().toLowerCase();
+            const autor = (msg.author || '').trim().toLowerCase();
 
             let przyciskUsun = '';
 
-            if (msg.author === mojNick) {
-                przyciskUsun = `<button onclick="usunWiadomosc(${msg.id})" class="delete-btn">❌</button>`;
+            if (autor && autor === mojNick) {
+               przyciskUsun = `<button onclick="usunWiadomosc(${msg.id})" class="delete-btn">❌</button>`;
             }
 
             // timestamp → bezpieczna obsługa
