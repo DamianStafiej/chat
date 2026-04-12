@@ -50,6 +50,9 @@ async function pobierzWiadomosci() {
         data.forEach(msg => {
             const div = document.createElement("div");
             div.classList.add("msg");
+            
+            //avatar
+            const linkAwatara = `https://api.dicebear.com/9.x/bottts/svg?`
 
             // timestamp → bezpieczna obsługa
             let godzina = "";
@@ -66,12 +69,12 @@ async function pobierzWiadomosci() {
             }
 
             div.innerHTML = `
-                <span class="msg-author">${msg.author}</span>
-                <span>${msg.text}</span>
-                <span style="float:right; opacity:0.6; font-size:12px;">
-                    ${godzina}
-                </span>
-            `;
+        <img src="${linkAwatara}" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-right:6px;">
+        <span class="msg-author">${msg.author}</span>
+        <span>${msg.text}</span>
+        <span style="float:right; opacity:0.6; font-size:12px;">
+            ${godzina}
+        </span>`;
 
             oknoCzatu.appendChild(div);
         });
