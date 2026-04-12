@@ -53,6 +53,13 @@ async function pobierzWiadomosci() {
             
             //avatar
             const linkAwatara = `https://api.dicebear.com/9.x/bottts/svg?seed=${msg.author}`;
+            const mojNick = localStorage.getItem("shoutboxNick");
+
+            let przyciskUsun = '';
+
+            if (msg.author === mojNick) {
+                przyciskUsun = `<button onclick="usunWiadomosc(${msg.id})" class="delete-btn">❌</button>`;
+            }
 
             // timestamp → bezpieczna obsługa
             let godzina = "";
@@ -74,13 +81,16 @@ async function pobierzWiadomosci() {
     <span class="msg-author">${msg.author}</span>
     <span>${msg.text}</span>
 
-   <button onclick="dajLajka(${msg.id})" class="like-btn">
-    ❤️ ${msg.likes || 0}
+    <button onclick="dajLajka(${msg.id})" class="like-btn">
+        ❤️ ${msg.likes || 0}
     </button>
+
+    ${przyciskUsun}
 
     <span style="float:right; opacity:0.6; font-size:12px;">
         ${godzina}
-    </span>`;
+    </span>
+`;
 
             oknoCzatu.appendChild(div);
         });
@@ -130,6 +140,18 @@ async function dajLajka(id) {
         pobierzWiadomosci(); // odśwież czat
     } catch (err) {
         console.error("Błąd lajkowania:", err);
+    }
+}
+
+window.usunWiadomosc = async function(id) {
+    try {
+        await fetch(`https://apichat.m89.pl/api/messages/${id}`, {
+            method: 'DELETE'
+        });
+
+        pobierzWiadomosci();
+    } catch (err) {
+        console.error("Błąd usuwania wiadomości:", err);
     }
 }
 
