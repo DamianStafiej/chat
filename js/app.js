@@ -74,8 +74,8 @@ async function pobierzWiadomosci() {
     <span class="msg-author">${msg.author}</span>
     <span>${msg.text}</span>
 
-    <button onclick="dajLajka(${msg.id})" style="margin-left:10px; cursor:pointer;">
-        ❤️ ${msg.likes || 0}
+   <button onclick="dajLajka(${msg.id})" class="like-btn">
+    ❤️ ${msg.likes || 0}
     </button>
 
     <span style="float:right; opacity:0.6; font-size:12px;">

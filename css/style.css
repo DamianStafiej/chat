@@ -1,0 +1,22 @@
+.like-btn {
+    font-size: 12px;
+    padding: 2px 6px;
+    cursor: pointer;
+
+    border: none;
+    background: transparent;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.like-btn {
+    font-size: 10px;
+    padding: 1px 5px;
+}
+
+.like-btn:hover {
+    transform: scale(1.1);
+    transition: 0.2s;
+}
