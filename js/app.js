@@ -52,7 +52,7 @@ async function pobierzWiadomosci() {
             div.classList.add("msg");
             
             //avatar
-            const linkAwatara = `https://api.dicebear.com/9.x/bottts/svg?`
+            const linkAwatara = `https://api.dicebear.com/9.x/bottts/svg?seed=${msg.author}`;
 
             // timestamp → bezpieczna obsługa
             let godzina = "";
