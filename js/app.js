@@ -68,13 +68,19 @@ async function pobierzWiadomosci() {
                 }
             }
 
-            div.innerHTML = `
-        <img src="${linkAwatara}" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-right:6px;">
-        <span class="msg-author">${msg.author}</span>
-        <span>${msg.text}</span>
-        <span style="float:right; opacity:0.6; font-size:12px;">
-            ${godzina}
-        </span>`;
+           div.innerHTML = `
+    <img src="${linkAwatara}" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-right:6px;">
+
+    <span class="msg-author">${msg.author}</span>
+    <span>${msg.text}</span>
+
+    <button onclick="dajLajka(${msg.id})" style="margin-left:10px; cursor:pointer;">
+        ❤️ ${msg.likes || 0}
+    </button>
+
+    <span style="float:right; opacity:0.6; font-size:12px;">
+        ${godzina}
+    </span>`;
 
             oknoCzatu.appendChild(div);
         });
@@ -114,6 +120,20 @@ formularzWiadomosci.addEventListener("submit", async (event) => {
     poleTekstowe.value = "";
     pobierzWiadomosci();
 });
+
+async function dajLajka(id) {
+    try {
+        await fetch(`https://apichat.m89.pl/api/messages/${id}/like`, {
+            method: 'PATCH'
+        });
+
+        pobierzWiadomosci(); // odśwież czat
+    } catch (err) {
+        console.error("Błąd lajkowania:", err);
+    }
+}
+
+
 
 // start
 pobierzWiadomosci();
