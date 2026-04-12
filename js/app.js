@@ -1,91 +1,116 @@
-   function openTab(tabId) {
-            // Ukryj wszystkie zawartości
-            let contents = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < contents.length; i++) {
-                contents[i].classList.remove("active");
-            }
-            
-            // Odznacz wszystkie przyciski
-            let buttons = document.getElementsByClassName("tab-button");
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove("active");
-            }
+function openTab(tabId) {
+    // Ukryj wszystkie zakładki
+    let contents = document.getElementsByClassName("tab-content");
+    for (let i = 0; i < contents.length; i++) {
+        contents[i].classList.remove("active");
+    }
 
-            // Pokaż wybraną zakładkę
-            document.getElementById(tabId).classList.add("active");
-            
-            // Zaznacz kliknięty przycisk (szukamy po event.target)
-            event.currentTarget.classList.add("active");
-        }
+    // Odznacz wszystkie przyciski
+    let buttons = document.getElementsByClassName("tab-button");
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove("active");
+    }
 
-        const btnWejdz = document.getElementById('btn-wejdz');
-        const inputNick = document.getElementById('input-nick');
+    // Pokaż wybraną zakładkę
+    document.getElementById(tabId).classList.add("active");
 
-        const ekranLogowania = document.getElementById("ekran-logowania");
-        const ekranCzatu = document.getElementById("ekran-czatu");
+    // Zaznacz kliknięty przycisk
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add("active");
+    }
+}
 
-        btnWejdz.addEventListener("click", () => {
-            const nick = inputNick.value;
-            if (nick) {
-                localStorage.setItem("shoutboxNick", nick);
-                
-                ekranLogowania.style.display = "none";
-                ekranCzatu.style.display = "block";
-            }
-        });
+// ===== LOGIN =====
+const btnWejdz = document.getElementById("btn-wejdz");
+const inputNick = document.getElementById("input-nick");
 
-        async function pobierzWiadomosci() {
-            const request = await fetch("https://apichat.m89.pl/api/messages")
-            const data = await request.json();
+const ekranLogowania = document.getElementById("ekran-logowania");
+const ekranCzatu = document.getElementById("ekran-czatu");
 
-            const oknoCzatu = document.getElementById("okno-czatu");
-            oknoCzatu.innerHTML = "";
+btnWejdz.addEventListener("click", () => {
+    const nick = inputNick.value;
 
-            data.forEach(msg => {
-                const div = document.createElement("div");
-                div.classList.add("msg");
+    if (nick) {
+        localStorage.setItem("shoutboxNick", nick);
 
-                // informacje o wiadomości
+        ekranLogowania.style.display = "none";
+        ekranCzatu.style.display = "block";
+    }
+});
+
+// ===== POBIERANIE WIADOMOŚCI =====
+async function pobierzWiadomosci() {
+    try {
+        const request = await fetch("https://apichat.m89.pl/api/messages");
+        const data = await request.json();
+
+        const oknoCzatu = document.getElementById("okno-czatu");
+        oknoCzatu.innerHTML = "";
+
+        data.forEach(msg => {
+            const div = document.createElement("div");
+            div.classList.add("msg");
+
+            // timestamp → bezpieczna obsługa
+            let godzina = "";
+
+            if (msg.timestamp) {
                 const data = new Date(msg.timestamp);
-                const godzina = data.toLocaleTimeString("pl-PL", {
-                    hour: "2-digit",
-                    minute: '2-digit'
-                });
 
-                  div.innerHTML = `
-            <span class="msg-author">${msg.author}</span>
-            <span>${msg.text}</span>
-            <span style="float:right; opacity:0.6; font-size:12px;">
-                ${godzina}
-            </span>`;
-            
-                oknoCzatu.appendChild(div);
-            });
-        }
+                if (!isNaN(data)) {
+                    godzina = data.toLocaleTimeString("pl-PL", {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
+                }
+            }
 
-        setInterval(pobierzWiadomosci, 3000)
+            div.innerHTML = `
+                <span class="msg-author">${msg.author}</span>
+                <span>${msg.text}</span>
+                <span style="float:right; opacity:0.6; font-size:12px;">
+                    ${godzina}
+                </span>
+            `;
 
-        const formularzWiadomosci = document.getElementById("formularz-wiadomosci");
-        const poleTekstowe = document.getElementById("input-wiadomosc");
-
-        formularzWiadomosci.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const nowaWiadomosc = {
-                author: localStorage.getItem("shoutboxNick"),
-                text: document.getElementById("input-wiadomosc").value,
-            };
-
-            await fetch ("https://apichat.m89.pl/api/messages", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(nowaWiadomosc)
-            });
-
-            poleTekstowe.value = "";
-            pobierzWiadomosci();
+            oknoCzatu.appendChild(div);
         });
 
+    } catch (err) {
+        console.error("Błąd pobierania wiadomości:", err);
+    }
+}
 
+// auto refresh (polling)
+setInterval(pobierzWiadomosci, 3000);
+
+// ===== WYSYŁANIE WIADOMOŚCI =====
+const formularzWiadomosci = document.getElementById("formularz-wiadomosci");
+const poleTekstowe = document.getElementById("input-wiadomosc");
+
+formularzWiadomosci.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const text = poleTekstowe.value;
+
+    if (!text) return;
+
+    const nowaWiadomosc = {
+        author: localStorage.getItem("shoutboxNick"),
+        text: text
+    };
+
+    await fetch("https://apichat.m89.pl/api/messages", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(nowaWiadomosc)
+    });
+
+    poleTekstowe.value = "";
+    pobierzWiadomosci();
+});
+
+// start
+pobierzWiadomosci();
