@@ -45,8 +45,20 @@
                 const div = document.createElement("div");
                 div.classList.add("msg");
 
-                div.innerHTML = msg.author + ": " + msg.text;
+                // informacje o wiadomości
+                const data = new Date(msg.timestamp);
+                const godzina = data.toLocaleTimeString("pl-PL", {
+                    hour: "2-digit",
+                    minute: '2-digit'
+                });
 
+                  div.innerHTML = `
+            <span class="msg-author">${msg.author}</span>
+            <span>${msg.text}</span>
+            <span style="float:right; opacity:0.6; font-size:12px;">
+                ${godzina}
+            </span>`;
+            
                 oknoCzatu.appendChild(div);
             });
         }
@@ -75,3 +87,5 @@
             poleTekstowe.value = "";
             pobierzWiadomosci();
         });
+
+
